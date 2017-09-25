@@ -4,6 +4,8 @@
 
 @interface VENTouchLockSplashViewController ()
 @property (nonatomic, assign) BOOL isSnapshotViewController;
+
+@property (nonatomic) BOOL willDismiss;
 @end
 
 @implementation VENTouchLockSplashViewController
@@ -62,14 +64,16 @@
 {
     [super viewDidAppear:animated];
     if (!self.isSnapshotViewController) {
-        if ([VENTouchLock shouldUseTouchID]) {
+        if ([VENTouchLock shouldUseTouchID] && !self.willDismiss) {
             dispatch_async(dispatch_get_main_queue(), ^{
-                
+
                 [self showTouchID];
             });
         }
     }
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(appWillEnterForeground) name:UIApplicationWillEnterForegroundNotification object:nil];
+
+    self.willDismiss = NO;
 }
 
 - (void)viewDidDisappear:(BOOL)animated
@@ -130,6 +134,8 @@
     if (!self.presentedViewController) {
         if (![VENTouchLock shouldUseTouchID]) {
             [self showPasscodeAnimated:NO];
+        } else {
+            [self showTouchID];
         }
     }
 }
@@ -145,6 +151,7 @@
                       unlockType:(VENTouchLockSplashViewControllerUnlockType)unlockType
                         animated:(BOOL)animated
 {
+    self.willDismiss = YES;
     [self.presentingViewController dismissViewControllerAnimated:animated completion:^{
         if (self.didFinishWithSuccess) {
             self.didFinishWithSuccess(success, unlockType);
