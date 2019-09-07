@@ -111,6 +111,7 @@
         enterPassCodeViewController = [self enterPasscodeVC];
     }
 
+    enterPassCodeViewController.modalPresentationStyle = UIModalPresentationFullScreen;
     [self presentViewController:enterPassCodeViewController animated:animated completion:nil];
 }
 
